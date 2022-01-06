@@ -1,7 +1,16 @@
 <script>
+import { onMount } from "svelte";
+
     export let people;
-	export let planet;
+	let planet = {};
 	import { Link } from "svelte-routing";
+	import SWService from './Service.js';
+	const swService = new SWService;
+
+	onMount(() => {
+		swService.getSWApi(people.homeworld)
+		.then(res => planet = res);
+	});
 </script>
 
 <div class="main">
@@ -35,7 +44,7 @@
 	}
 
 	.char {
-		color: $color;
+		color: white;
 		text-transform: uppercase;
 		font-size: 2rem;
 	}

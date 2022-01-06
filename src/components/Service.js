@@ -24,6 +24,29 @@ class SWService {
         .then(res => res.results);
     }
 
+    transformArrayOfRefs(path, arrayName) {
+		return new Promise((resolve, reject) => {
+			this.getSWApi(path)
+			.then((res) => {
+				const dataObject = {
+				...res,
+				};
+				const arrayOfPromises = res[arrayName].map((url) => {
+				return this.getSWApi(url);
+				});
+				Promise.all(arrayOfPromises).then((res) => {
+				const currentRes = res;
+				dataObject[arrayName] = currentRes;
+				resolve(dataObject);
+				}).catch((e) => {
+				reject(`неправильный url`);
+				});
+			}).catch((e) => {
+				reject(e);
+			});
+		});
+	}
+
     // getSome = async (path) => {
     //     const res = await this.getSWApi(path);
     //     return res;
@@ -34,6 +57,8 @@ class SWService {
     //     const res = await this.getSWApi(path);
     //     return res.results;
     // }
+
+    
 
 
 }

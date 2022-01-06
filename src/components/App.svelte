@@ -7,14 +7,15 @@
 
 
 
+	const swService = new SWService;
 
-	let selectedPlanet = null;
-	let selectedPeople = null;
+	let selectedPeople;
+	swService.getSWApi('https://swapi.dev/api/people/1/')
+	.then(res => selectedPeople = res);
 
 	function changePeople(event) {
 		selectedPeople = event.detail.selected;
-		selectedPlanet = selectedPeople.homeworld;
-		 transformPlanet(selectedPeople.homeworld);
+
 	} 
 
 	function getPeopleByPath(event) {
@@ -22,7 +23,7 @@
 		getPeople(path);
 	}
 
-	const swService = new SWService;
+
 
 	// function getPlanet(path) {
 	// 	swService.getSome(path.substr(21))
@@ -52,22 +53,22 @@
 
 
 
-	function transformPlanet(path) {
-		swService.getSWApi(path)
-		.then((res) => {
-			selectedPlanet = {
-				...res,
-				residents:[],
-				}
-			const arrayOfPromises = res.residents.map((url) => {
-				return swService.getSWApi(url)
-			});
-			Promise.allSettled(arrayOfPromises).then((res) => {
-				const currentRes = res.map(item => item.value);
-				selectedPlanet.residents = currentRes;
-			});
-		});
-	} 
+	// function transformPlanet(path) {
+	// 	swService.getSWApi(path)
+	// 	.then((res) => {
+	// 		selectedPlanet = {
+	// 			...res,
+	// 			residents:[],
+	// 			}
+	// 		const arrayOfPromises = res.residents.map((url) => {
+	// 			return swService.getSWApi(url)
+	// 		});
+	// 		Promise.allSettled(arrayOfPromises).then((res) => {
+	// 			const currentRes = res.map(item => item.value);
+	// 			selectedPlanet.residents = currentRes;
+	// 		});
+	// 	});
+	// } 
 
 	
 
@@ -114,8 +115,8 @@
 		</div>
 	</nav>
 	<div>
-	  <Route path="char"><CurrentCharacter people={selectedPeople} planet={selectedPlanet}/></Route>
-	  <Route path="planet"><CurrentPlanet on:message={getPeopleByPath} planet={selectedPlanet}/></Route>
+	  <Route path="char"><CurrentCharacter people={selectedPeople}/></Route>
+	  <Route path="planet"><CurrentPlanet on:message={getPeopleByPath} planetRef={selectedPeople.homeworld}/></Route>
 	  <Route path="/"><CharacterList on:message={changePeople}/></Route>
 	</div>
 </Router>

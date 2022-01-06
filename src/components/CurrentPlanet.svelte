@@ -1,10 +1,67 @@
 <script>
-import { beforeUpdate } from "svelte";
+import { onMount } from "svelte";
 import { createEventDispatcher } from 'svelte';
 import { Link } from "svelte-routing";
+import SWService from './Service.js';
 
-	export let planet;
-    let residents = [];
+	const swService = new SWService;
+
+	export let planetRef;
+	// let residents = [];
+	let planet = null; 
+
+	onMount(async () => {
+		// transformResidents(planetRef);
+		try {
+			planet = await swService.transformArrayOfRefs(planetRef, 'residents');
+		} catch (e) {
+			console.error(e);
+			planet = {
+				name: null,
+				residents: [],
+			}
+		}
+
+	});
+
+
+	
+	// function transformResidents(path) {
+	// 	swService.getSWApi(path)
+	// 	.then((res) => {
+	// 		planet = {
+	// 			...res,
+	// 			residents:[],
+	// 			};
+	// 		const arrayOfPromises = res.residents.map((url) => {
+	// 			return swService.getSWApi(url);
+	// 		});
+	// 		Promise.allSettled(arrayOfPromises).then((res) => {
+	// 			const currentRes = res.map(item => item.value);
+	// 			planet.residents = currentRes;
+	// 		});
+	// 	});
+	// } 
+
+	// function transformArrayOfRefs(path, arrayName) {
+	// 	console.log(path);
+	// 	swService.getSWApi(path)
+	// 	.then((res) => {
+	// 		const dataObject = {
+	// 			...dataObject,
+	// 			...res,
+	// 		}
+	// 		const arrayOfPromises = res[arrayName].map((url) => {
+	// 			return swService.getSWApi(url);
+	// 		});
+	// 		Promise.allSettled(arrayOfPromises).then((res) => {
+	// 			const currentRes = res.map(item => item.value);
+	// 			dataObject[arrayName] = currentRes;
+	// 		});
+	// 	});
+	// } 
+
+
 
 
 
@@ -24,14 +81,11 @@ import { Link } from "svelte-routing";
 
 
 
-    beforeUpdate(() => {
-        residents = planet.residents;
-    })
 
 </script>
 
 <div class="main">
-{#if !planet.name} 
+{#if !planet} 
 <span class="choose">Выберите персонажа</span>
 {:else}
 <span class="char">
@@ -41,9 +95,9 @@ import { Link } from "svelte-routing";
 		<br>
 		Климат: {planet.climate}
 		<br>
-		{#if residents.length}
+		{#if planet.residents.length}
 			Жители: <br>
-			{#each residents as resident, i}
+			{#each planet.residents as resident}
 				<div class="char">
 					<Link to="char"
 					on:click={() => peopleClickHandle(resident.url)}
