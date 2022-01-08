@@ -47,6 +47,32 @@ class SWService {
 		});
 	}
 
+    get10TransformedPeoples(path) {
+        return new Promise((resolve, reject) => {
+            this.getAllCharacters(path)
+            .then((res) => {
+                const dataArray = [...res];
+                let arrayOfPromises = [];
+                    dataArray.forEach((people, i) =>{
+                    if (!people.species.length) {
+                        people.species = ["https://swapi.dev/api/species/1/"];
+                    }
+                    arrayOfPromises = [...arrayOfPromises, this.getSWApi(people.species)];
+                });
+                Promise.all(arrayOfPromises)
+                .then((res) => {
+                    const newRes = res.map((species) => {
+                        return species.name;
+                    });
+                    dataArray.forEach((people, i) => {
+                        people.speciesName = newRes[i];
+                    })
+                    resolve(dataArray);
+                })
+            })
+        })
+    }
+
     // getSome = async (path) => {
     //     const res = await this.getSWApi(path);
     //     return res;

@@ -4,10 +4,12 @@
 	import CharacterList from './CharacterList.svelte';
 	import CurrentPlanet from './CurrentPlanet.svelte';
 	import { Router, Route, links } from "svelte-routing";
-
+	
+	export let url = '';
 
 
 	const swService = new SWService;
+
 
 	let selectedPeople;
 	swService.getSWApi('https://swapi.dev/api/people/1/')
@@ -90,37 +92,41 @@
 
 </script>
 
-<Router>
-	<header class='header'>
-		<div class="header__content">
-			<img src="./img/star.png" alt="" class="header__content-star">
-			<h1 class="header__content-title">CHARACTER Encyclopedia</h1>
-			<img src="./img/wars.png" alt="" class="header__content-wars">
-		</div>
-	</header>
-
-
-
-
-
-
-
-
-
-	<nav>
-		<div use:links class="nav">
-			<a href="/">All Characters</a>
-			<a href="char">Selected Character</a>
-			<a href="planet">Selected Planet</a>
-		</div>
-	</nav>
-	<div>
-	  <Route path="char"><CurrentCharacter people={selectedPeople}/></Route>
-	  <Route path="planet"><CurrentPlanet on:message={getPeopleByPath} planetRef={selectedPeople.homeworld}/></Route>
-	  <Route path="/"><CharacterList on:message={changePeople}/></Route>
+<div class="wrapper">
+	<div class="content">
+		<Router url={url}>
+			<header class='header'>
+				<div class="header__content">
+					<img src="./img/star.png" alt="" class="header__content-star">
+					<h1 class="header__content-title">CHARACTER Encyclopedia</h1>
+					<img src="./img/wars.png" alt="" class="header__content-wars">
+				</div>
+			</header>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+			<nav>
+				<div use:links class="nav">
+					<a href="/">All Characters</a>
+					<a href="char">Selected Character</a>
+					<a href="planet">Selected Planet</a>
+				</div>
+			</nav>
+			<div>
+			  <Route path="planet"><CurrentPlanet on:message={getPeopleByPath} planetRef={selectedPeople.homeworld}/></Route>
+			  <Route path="/"><CharacterList on:message={changePeople}/></Route>
+			  <Route path="char"><CurrentCharacter people={selectedPeople}/></Route>
+			</div>
+		</Router>
 	</div>
-</Router>
-
+	<div class="footer"><div class='footer-text'>STAR WARS CHARACTER Encyclopedia, 2k22</div></div>
+</div>
 
 <!-- <CurrentCharacter people={selectedPeople} planet={selectedPlanet}/>
 <CharacterList on:message={changePeople}/>
@@ -153,4 +159,35 @@
 	}
 	}
 
+	.wrapper {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		height: 100%;
+		}
+	.content {
+		flex: 1 0 auto;
+		}
+
+
+
+
+	.footer {
+		flex: 0 0 auto;
+		height: 120px;
+		background: #1A1A1A;
+		font-family: Roboto;
+		font-style: normal;
+		font-weight: bold;
+		font-size: 18px;
+		letter-spacing: 0.11em;
+		text-transform: uppercase;
+		font-feature-settings: 'cpsp' on;
+		color: #FFFFFF;
+		text-align: center;
+		padding: 0;
+	}
+	.footer-text {
+		margin-top: 48px;
+	}
 </style>
