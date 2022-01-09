@@ -100,9 +100,7 @@
         margin: 7px 0 0 0;
     }
 
-    .modal__exit {
-        display: none;
-    }
+
 
     .modal {
         &__bg {
