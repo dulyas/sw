@@ -111,13 +111,13 @@
 		
 		
 		
-			<nav>
+			<!-- <nav>
 				<div use:links class="nav">
 					<a href="/">All Characters</a>
 					<a href="char">Selected Character</a>
 					<a href="planet">Selected Planet</a>
 				</div>
-			</nav>
+			</nav> -->
 			<div>
 			  <Route path="planet"><CurrentPlanet on:message={getPeopleByPath} planetRef={selectedPeople.homeworld}/></Route>
 			  <Route path="/"><CharacterList on:message={changePeople}/></Route>
@@ -133,17 +133,20 @@
 <CurrentPlanet on:message={getPeopleByPath} planet={selectedPlanet}/> -->
 
 <style type="text/scss">
-	@import '../styles/vars';
+
 
 	.header {
-		background: url('/img/Header_bg.png')center center/cover no-repeat;
+		background: url('/img/Header_bg.png')center center / cover no-repeat;
 		height: 40vh;
 		width: 100%;
-		padding: 5vh 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		text-align: center;
+		z-index: 1;
 		h1 {
 			text-transform: uppercase;
-			font-size: 1.6rem;
+			font-size: 24px;
 			letter-spacing: 0.11em;
 			text-align: center;
 			color: white;
@@ -189,5 +192,26 @@
 	}
 	.footer-text {
 		margin-top: 48px;
+	}
+
+	@media (max-width: 618px) {
+		.header {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 30vh;
+			.header__content {
+			&-title {
+				font-size: 14px;
+			}
+		}
+			img {
+				width: 212px;
+				height: 50px;
+			}
+		}
+		.footer {
+			font-size: 13px;
+		}
 	}
 </style>
