@@ -8,25 +8,29 @@
     let promise;
 
 
+
     const dispatch = createEventDispatcher();
     const close = () => {
         dispatch('close')
     };
 
-
-
-        function generateRandomColor() {
-        return 'background:#' + (Math.random().toString(16) + '000000').substring(2,8).toUpperCase();
-
+    const handle_keydown = e => {
+		if (e.key === 'Escape') {
+			close();
+			return;
+		};
     }
+
 </script>
 
-    <div class="modal__bg" on:click={close}></div>
+    <svelte:window on:keydown={handle_keydown}/>
 
+   <div class="modal__bg" on:click={close}></div>
+    <img src="./img/icons/exit.svg" on:click={close} alt="exit" class="modal__exit">
     <div class="modal__content">
         <div class="modal-flex-name">
             <div class="cards__item-avatar"
-            style={generateRandomColor()}>{people.name[0]}</div>
+            style={people.color}>{people.name[0]}</div>
             <div class="cards__item-name">{people.name}</div>
         </div>
         <div class="modal-line"></div>
@@ -41,7 +45,7 @@
                     <span class="modal__content__item-descr">Homeworld</span>
                     <span class="modal__content__item-result">
                     {#await promise = swService.getSWApi(people.homeworld)}
-                    ...подожджите
+                    loading...
                     {:then result}
                     {result.name}
                     {:catch error}
@@ -52,15 +56,7 @@
                 <div class="modal__content__item">
                     <img src="./img/icons/species.svg" alt="species" class="modal__content__item-img">
                     <span class="modal__content__item-descr">Species</span>
-                    <span class="modal__content__item-result">
-                        {#await promise = swService.getSWApi(people.species)}
-                        ...подожджите
-                        {:then result}
-                        {result.name}
-                        {:catch error}
-                        {error.message}
-                        {/await}
-                    </span>
+                    <span class="modal__content__item-result">{people.speciesName}</span>
                 </div>
                 <div class="modal__content__item">
                     <img src="./img/icons/films.svg" alt="films" class="modal__content__item-img">
@@ -68,7 +64,7 @@
                     <span class="modal__content__item-result">
                         {#each people.films as film}
                         {#await promise = swService.getSWApi(film)}
-                        подожджите...
+                        loaging...
                         {:then result}
                         <div class='film'>{result.title}</div>
                         {:catch error}
@@ -104,6 +100,10 @@
         margin: 7px 0 0 0;
     }
 
+    .modal__exit {
+        display: none;
+    }
+
     .modal {
         &__bg {
             position: fixed;
@@ -116,7 +116,7 @@
             z-index: 5;
         }
         &__content {
-            position: absolute;
+            position: fixed;
 		    left: 50%; top: 50%;
             transform: translate(-50%, -50%);
             width: 800px;
@@ -170,11 +170,38 @@
             margin: 71px auto;
         }
         &-line {
-            width: 640px;
+            width: 90%;
             height: 2px;
             background: #808080;
             justify-content: center;
             margin: 80px auto 0px auto;
+        }
+    }
+
+    @media (max-width: 710px) {
+        .modal {
+            &__content {
+                width: 100%;
+                height: 100%;
+                min-height: 0px;
+                &__item {
+                    margin: 20px 0;
+                }
+            }
+            &-flex-name {
+                margin: 48px 0 0 24px;
+            }
+            &-flex-info {
+                display: block;
+                padding-left: 24px;
+            }
+            &__exit {
+                display: block;
+                position: absolute;
+                top: 2%;
+                right: 4%;
+                z-index: 100;
+            }
         }
     }
 </style>

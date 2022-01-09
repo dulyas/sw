@@ -1,8 +1,6 @@
 <script>
     import { onMount } from 'svelte';
     import SWService from '../components/Service.js';
-    import { createEventDispatcher } from 'svelte';
-    import { links } from "svelte-routing";
     import Loading from '../components/Loading.svelte';
     import { fade, fly } from 'svelte/transition';
     import ModalCharacter from './ModalCharacter.svelte';
@@ -14,32 +12,17 @@
     let page = 1;
     let value = '';
     let showModal = false;
-
-    function generateRandomColor() {
-        return 'background:#' + (Math.random().toString(16) + '000000').substring(2,8).toUpperCase();
-
-    }
+    let selectedPeople;
+    let promise;
 
     $: peoples = [
         ...peoples,
         ...data
     ]
 
-
-
     const peopleClickHandle = (i) => {
-        dispatch('message', {
-			selected: peoples[i],
-		});
+        selectedPeople = peoples[i];
     }
-
-
-
-
-    const dispatch = createEventDispatcher();
-
-
-
 
     onMount(() => {
         setTimeout(async () => {
@@ -48,31 +31,18 @@
         }, 2000);
 
     })
-
-    // function nextPage() {
-    //     if (page < 9) {
-    //         page++
-    //     } else {
-    //         page = 1;
-    //     }
-    //         swService.getAllCharacters(`https://swapi.dev/api/people/?page=${page}`)
-    //         .then(res => peoples = res);
-    // }
-    
-    // function prevPage() {
-    //     if (page > 1) {
-    //         page--;
-    //     } else {
-    //         page = 9;
-    //     }
-    //         swService.getAllCharacters(`https://swapi.dev/api/people/?page=${page}`)
-    //         .then(res => peoples = res);
-    // }
     
     async function searchPeople(value) {
         data = [];
-        console.log(value);
         peoples = await swService.get10TransformedPeoples(`https://swapi.dev/api/people/?search=${value}`);
+        if (!peoples.length) {
+            peoples = [{
+                name: 'Not',
+                speciesName: 'found',
+                color: 'background:red',
+                error: true,
+            }]
+        }
     }
 
     async function load10Peoples() {
@@ -93,11 +63,9 @@
         }
     }
      
-    const debouncedSearch = debounce(searchPeople, 2000, false);
-    
+    const debouncedSearch = debounce(searchPeople, 3000, false);
         function debounce(func, wait, immediate) {
         let timeout;
-
         return function executedFunction() {
             const context = this;
             const args = arguments;
@@ -117,36 +85,62 @@
         };
     };
 
-    function log() {
+    function modal() {
         if (showModal) {
-        console.log('s');
+        showModal = false;
+        document.body.style.overflow = '';
+        } else {
+            showModal = true;
+            document.body.style.overflow = 'hidden';
         }
     }
+    
+    function handle_keydown(e) {
+        if (e.key === 'Enter') {
+            searchPeople(value);
+        }
+    }
+
+    function init(el) {
+        el.focus()
+    }
+
 
 </script>
 
 
-<svelte:window on:scroll={debounce(infiniteScroll, 1000, false)}/>
+<svelte:window on:keydown={handle_keydown} on:scroll={debounce(infiniteScroll, 1000, false)}/>
 
     {#if showModal && peoples.length}
-    <ModalCharacter on:close={log} people={peoples[0]}/>
+    <div in:fade out:fade>
+        <ModalCharacter on:close={modal} people={selectedPeople}/>
+    </div>
     {/if}
     
     <div class="container">
-        <div use:links class="cards__wrapper">
-            {#if peoples.length}
+        <div class="cards__wrapper">
             <div class="search">
-                <input bind:value={value} on:input={debouncedSearch(value)} type="text" placeholder='Search by name'>
+                <input bind:value={value} on:input={debouncedSearch(value)} type="text" placeholder='Search by name' use:init>
                 <img src="./img/icons/search.svg" alt="" class="search-img" on:click={() => searchPeople(value)}>
             </div>
+            {#if peoples.length}
                 {#each peoples as people, i}
-                        <div in:fly="{{ y: 100, duration: 2000 }}" class="cards__item"
-                        on:click={() => {peopleClickHandle(i); showModal = true}}>
-                            <div class="cards__item-avatar"
-                            style={generateRandomColor()}>{people.name[0]}</div>
-                            <div class="cards__item-name">{people.name}</div>
-                            <div class="cards__item-species">{people.speciesName}</div>
-                        </div>
+                    {#if !people.error}
+                    <div in:fly="{{ y: 100, duration: 2000 }}" class="cards__item"
+                    on:click={() => {peopleClickHandle(i); modal()}}>
+                        <div class="cards__item-avatar"
+                        style={people.color}>{people.name[0]}</div>
+                        <div class="cards__item-name">{people.name}</div>
+                        <div class="cards__item-species">{people.speciesName}</div>
+                    </div>
+                    {:else}
+                    <div in:fly="{{ y: 100, duration: 2000 }}" class="cards__item">
+                        <div class="cards__item-avatar"
+                        style={people.color}>{people.name[0]}</div>
+                        <div class="cards__item-name">{people.name}</div>
+                        <div class="cards__item-species">{people.speciesName}</div>
+                    </div>
+                    {/if}
                 {/each}
             {:else}
                 <div out:fade class="spinner">
@@ -163,10 +157,10 @@
 
     .spinner {
         width: 100%;
-        height: auto;
-        margin-top: 7%;
+        margin: 10% auto;
     }
 
+    
 
 
     .container {
@@ -240,6 +234,9 @@
         }
     }
     @media (max-width:618px) {
+        .spinner {
+            margin: 35% auto;
+        }
         .cards__item {
             width: 272px;
             height: 200px;

@@ -75,6 +75,21 @@
     }
   }
   
+  @media (max-width: 710px) {
+    .main-preloader {
+      transform: rotate(90deg);
+    }
+    @keyframes rotateShip {
+    0% {
+      transform: translateY(200px);
+    }
+    100% {
+      transform: translateY(-200px);
+    }
+  }
+  }
+
+
   //Animation Boost
   
   @keyframes boostB {
