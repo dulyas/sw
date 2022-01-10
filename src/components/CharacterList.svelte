@@ -105,11 +105,18 @@
         el.focus()
     }
 
+    function handleCardKeydown(e) {
+        if (e.key === 'Enter') {
+            modal();
+        } else {
+            console.log('sls')
+        }
+    }
 
 </script>
 
 
-<svelte:window on:keydown={handle_keydown} on:scroll={debounce(infiniteScroll, 1000, false)}/>
+<svelte:window  on:scroll={debounce(infiniteScroll, 1000, false)}/>
 
     {#if showModal && peoples.length}
     <div in:fade out:fade>
@@ -120,14 +127,15 @@
     <div class="container">
         <div class="cards__wrapper">
             <div class="search">
-                <input tabindex="1" bind:value={value} on:input={debouncedSearch(value)} type="text" placeholder='Search by name' use:init>
+                <input on:keydown={handle_keydown} tabindex="1" bind:value={value} on:input={debouncedSearch(value)} type="text" placeholder='Search by name' use:init>
                 <img src="./img/icons/search.svg" alt="" class="search-img" on:click={() => searchPeople(value)}>
             </div>
             {#if peoples.length}
                 {#each peoples as people, i}
                     {#if !people.error}
                     <div tabindex={i+2} in:fly="{{ y: 100, duration: 2000 }}" class="cards__item"
-                    on:click={() => {peopleClickHandle(i); modal()}}>
+                    on:click={() => {peopleClickHandle(i); modal()}}
+                    on:keydown={() => {peopleClickHandle(i); handleCardKeydown(event)}}>
                         <div class="cards__item-avatar"
                         style={people.color}>{people.name[0]}</div>
                         <div class="cards__item-name">{people.name}</div>
