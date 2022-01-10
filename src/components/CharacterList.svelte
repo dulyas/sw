@@ -120,13 +120,13 @@
     <div class="container">
         <div class="cards__wrapper">
             <div class="search">
-                <input bind:value={value} on:input={debouncedSearch(value)} type="text" placeholder='Search by name' use:init>
+                <input tabindex="1" bind:value={value} on:input={debouncedSearch(value)} type="text" placeholder='Search by name' use:init>
                 <img src="./img/icons/search.svg" alt="" class="search-img" on:click={() => searchPeople(value)}>
             </div>
             {#if peoples.length}
                 {#each peoples as people, i}
                     {#if !people.error}
-                    <div in:fly="{{ y: 100, duration: 2000 }}" class="cards__item"
+                    <div tabindex={i+2} in:fly="{{ y: 100, duration: 2000 }}" class="cards__item"
                     on:click={() => {peopleClickHandle(i); modal()}}>
                         <div class="cards__item-avatar"
                         style={people.color}>{people.name[0]}</div>
